@@ -158,7 +158,7 @@
                 </div>
             @elseif($contentBlock->type === 'events')
                 <!-- Events List Content Block -->
-                <main id="events" class="max-w-7xl mx-auto py-12 sm:px-6 lg:px-8">
+                <main id="events" class="max-w-7xl mx-auto sm:px-6 lg:px-8">
                     <div class="px-4 py-6 sm:px-0">
                         <div class="text-center mb-8">
                             <h2 class="text-3xl font-bold text-gray-900">{{ $contentBlock->title }}</h2>
