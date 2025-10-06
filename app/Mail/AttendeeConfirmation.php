@@ -49,12 +49,16 @@ class AttendeeConfirmation extends Mailable
             ->size(200)
             ->generate($this->registration->getQrCodeData());
 
+        // QR Token for manual check-in
+        $token = $this->registration->qr_code_token;
+
         return new Content(
             markdown: 'emails.attendee-confirmation',
             with: [
                 'registration' => $this->registration,
                 'event' => $this->event,
                 'qrCode' => $qrCode,
+                'token' => $token
             ],
         );
     }
