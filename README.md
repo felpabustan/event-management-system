@@ -54,7 +54,7 @@ A comprehensive Laravel-based event management system with user registration, ad
 
 - **Backend**: Laravel 12
 - **Frontend**: Blade templating with Tailwind CSS
-- **Database**: SQLite (configurable)
+- **Database**: MySQL
 - **Payment**: Stripe integration
 - **Email**: Laravel Mail system
 - **Authentication**: Laravel Breeze
@@ -81,6 +81,7 @@ A comprehensive Laravel-based event management system with user registration, ad
 
 4. **Database setup**
    ```bash
+   # Create a MySQL database first, then:
    php artisan migrate
    php artisan db:seed
    ```
@@ -105,8 +106,12 @@ APP_NAME="Event Management System"
 APP_URL=http://localhost
 
 # Database
-DB_CONNECTION=sqlite
-DB_DATABASE=/path/to/database.sqlite
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=your_database_name
+DB_USERNAME=your_username
+DB_PASSWORD=your_password
 
 # Mail Configuration
 MAIL_MAILER=smtp
@@ -119,6 +124,30 @@ MAIL_PASSWORD=your-password
 STRIPE_KEY=your-stripe-public-key
 STRIPE_SECRET=your-stripe-secret-key
 ```
+
+### Database Setup
+
+1. **Create MySQL Database**
+   ```sql
+   CREATE DATABASE event_management_system;
+   ```
+
+2. **Update Environment Variables**
+   Update your `.env` file with your MySQL credentials:
+   ```env
+   DB_CONNECTION=mysql
+   DB_HOST=127.0.0.1
+   DB_PORT=3306
+   DB_DATABASE=event_management_system
+   DB_USERNAME=your_mysql_username
+   DB_PASSWORD=your_mysql_password
+   ```
+
+3. **Run Migrations and Seeders**
+   ```bash
+   php artisan migrate
+   php artisan db:seed
+   ```
 
 ### Admin User Setup
 
@@ -237,5 +266,3 @@ For technical support or questions:
 - Email notification system
 
 ---
-
-Built with ❤️ using Laravel and Tailwind CSS
