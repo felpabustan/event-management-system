@@ -45,11 +45,13 @@ class EventController extends Controller
         ]);
 
         // Set default values for pricing
-        $validated['is_paid'] = $request->has('is_paid');
+        $validated['is_paid'] = $request->has('is_paid') && $request->boolean('is_paid');
+        
         if (!$validated['is_paid']) {
             $validated['price'] = null;
             $validated['currency'] = null;
         } else {
+            // Ensure currency has a default value if not provided
             $validated['currency'] = $validated['currency'] ?? 'USD';
         }
 
@@ -94,11 +96,13 @@ class EventController extends Controller
         ]);
 
         // Set default values for pricing
-        $validated['is_paid'] = $request->has('is_paid');
+        $validated['is_paid'] = $request->has('is_paid') && $request->boolean('is_paid');
+        
         if (!$validated['is_paid']) {
             $validated['price'] = null;
             $validated['currency'] = null;
         } else {
+            // Ensure currency has a default value if not provided
             $validated['currency'] = $validated['currency'] ?? 'USD';
         }
 

@@ -71,7 +71,8 @@ class Event extends Model
             return 'Free';
         }
         
-        return strtoupper($this->currency) . ' ' . number_format($this->price, 2);
+        $currency = $this->currency ?: 'USD';
+        return strtoupper($currency) . ' ' . number_format($this->price, 2);
     }
 
     public function getPriceInCentsAttribute(): int

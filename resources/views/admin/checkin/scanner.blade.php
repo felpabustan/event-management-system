@@ -11,7 +11,25 @@
     </x-slot>
 
     <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            <div class="max-w-4xl mx-auto py-8">
+        <!-- Security Notice -->
+        <div class="mb-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <svg class="h-5 w-5 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                    </svg>
+                </div>
+                <div class="ml-3">
+                    <h3 class="text-sm font-medium text-blue-800">Camera Access Required</h3>
+                    <div class="mt-2 text-sm text-blue-700">
+                        <p>For QR scanning to work, please ensure you're accessing this page via <code class="bg-blue-100 px-1 rounded">http://localhost:8000</code> and grant camera permissions when prompted.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white overflow-hidden shadow rounded-lg">
             @if(session('success'))
                 <div class="mb-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
                     <span class="block sm:inline">{{ session('success') }}</span>
@@ -227,6 +245,24 @@
 
         // Initialize the QR scanner
         function initializeScanner() {
+            // Check if we're in a secure context
+            if (!window.isSecureContext && location.hostname !== 'localhost') {
+                document.getElementById('cameraSelect').innerHTML = '<option>Camera access requires HTTPS or localhost</option>';
+                document.getElementById('qr-reader').innerHTML = `
+                    <div class="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded">
+                        <h4 class="font-bold">Camera Access Restricted</h4>
+                        <p class="text-sm mt-2">Camera access is only supported in secure contexts (HTTPS) or when running on localhost.</p>
+                        <p class="text-sm mt-1"><strong>Solutions:</strong></p>
+                        <ul class="text-sm mt-1 ml-4 list-disc">
+                            <li>Access the site via <code>http://localhost:8000</code> instead of <code>http://127.0.0.1:8000</code></li>
+                            <li>Use the manual token entry below</li>
+                            <li>Set up HTTPS for production</li>
+                        </ul>
+                    </div>
+                `;
+                return;
+            }
+
             // Get available cameras
             Html5Qrcode.getCameras().then(devices => {
                 if (devices && devices.length) {
@@ -255,10 +291,37 @@
                     });
                 } else {
                     document.getElementById('cameraSelect').innerHTML = '<option>No cameras found</option>';
+                    document.getElementById('qr-reader').innerHTML = `
+                        <div class="bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 rounded">
+                            <h4 class="font-bold">No Cameras Detected</h4>
+                            <p class="text-sm mt-2">No cameras were found on this device. Please use the manual token entry below.</p>
+                        </div>
+                    `;
                 }
             }).catch(err => {
                 console.error('Error getting cameras:', err);
                 document.getElementById('cameraSelect').innerHTML = '<option>Error loading cameras</option>';
+                
+                let errorMessage = 'Unknown error occurred';
+                if (err.message && err.message.includes('secure context')) {
+                    errorMessage = 'Camera access requires HTTPS or localhost';
+                } else if (err.message) {
+                    errorMessage = err.message;
+                }
+                
+                document.getElementById('qr-reader').innerHTML = `
+                    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+                        <h4 class="font-bold">Camera Access Error</h4>
+                        <p class="text-sm mt-2">${errorMessage}</p>
+                        <p class="text-sm mt-2"><strong>Solutions:</strong></p>
+                        <ul class="text-sm mt-1 ml-4 list-disc">
+                            <li>Access the site via <code>http://localhost:8000</code></li>
+                            <li>Grant camera permissions when prompted</li>
+                            <li>Use the manual token entry below</li>
+                            <li>Try refreshing the page</li>
+                        </ul>
+                    </div>
+                `;
             });
         }
 
