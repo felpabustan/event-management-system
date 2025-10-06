@@ -22,3 +22,14 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+# Additional common ignores
+*.app
+*.exe
+*.war
+*.mp4
+*.tiff
+*.avi
+*.flv
+*.mov
+*.wmv
