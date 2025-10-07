@@ -165,14 +165,7 @@
                         </div>
 
                         @php
-                            $eventsLimit = $contentBlock->content['limit'] ?? 6;
-                            $showPast = $contentBlock->content['show_past'] ?? false;
-                            
-                            $eventsQuery = \App\Models\Event::query();
-                            if (!$showPast) {
-                                $eventsQuery->where('date', '>=', now()->toDateString());
-                            }
-                            $limitedEvents = $eventsQuery->orderBy('date', 'asc')->limit($eventsLimit)->get();
+                            $limitedEvents = $contentBlock->getFilteredEvents();
                         @endphp
 
                         @if($limitedEvents->count() > 0)
@@ -182,15 +175,28 @@
                                         <div class="p-6">
                                             <div class="flex items-center">
                                                 <div class="flex-shrink-0">
-                                                    <div class="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center">
-                                                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                                                        </svg>
-                                                    </div>
+                                                    @if($event->category)
+                                                        <div class="w-10 h-10 rounded-lg flex items-center justify-center" style="background-color: {{ $event->category->color }}">
+                                                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                                            </svg>
+                                                        </div>
+                                                    @else
+                                                        <div class="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center">
+                                                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                                            </svg>
+                                                        </div>
+                                                    @endif
                                                 </div>
                                                 <div class="ml-4 flex-1">
                                                     <h3 class="text-lg font-medium text-gray-900">{{ $event->title }}</h3>
                                                     <p class="text-sm text-gray-500">{{ $event->venue }}</p>
+                                                    @if($event->category)
+                                                        <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full mt-1" style="background-color: {{ $event->category->color }}20; color: {{ $event->category->color }}">
+                                                            {{ $event->category->name }}
+                                                        </span>
+                                                    @endif
                                                 </div>
                                             </div>
 

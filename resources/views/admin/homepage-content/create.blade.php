@@ -164,6 +164,41 @@
                                     <label for="events_limit" class="block text-sm font-medium text-gray-700 mb-2">Number of Events to Show</label>
                                     <input type="number" id="events_limit" name="content[limit]" min="1" max="20" class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" value="{{ old('content.limit', 6) }}">
                                 </div>
+                                
+                                <div>
+                                    <label for="category_filter" class="block text-sm font-medium text-gray-700 mb-2">Category Filter</label>
+                                    <select id="category_filter" name="content[category_filter]" class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
+                                        <option value="all" {{ old('content.category_filter', 'all') == 'all' ? 'selected' : '' }}>All Categories</option>
+                                        <option value="specific" {{ old('content.category_filter') == 'specific' ? 'selected' : '' }}>Specific Categories</option>
+                                        <option value="exclude" {{ old('content.category_filter') == 'exclude' ? 'selected' : '' }}>Exclude Categories</option>
+                                    </select>
+                                    <p class="mt-1 text-sm text-gray-500">Choose how to filter events by category</p>
+                                </div>
+                                
+                                <div id="category-selection" style="display: none;">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Select Categories</label>
+                                    <div class="space-y-2 max-h-40 overflow-y-auto border border-gray-300 rounded-md p-3">
+                                        @foreach($categories as $category)
+                                            <label class="flex items-center">
+                                                <input type="checkbox" name="content[selected_categories][]" value="{{ $category->id }}" 
+                                                       class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500"
+                                                       {{ in_array($category->id, old('content.selected_categories', [])) ? 'checked' : '' }}>
+                                                <span class="ml-2 text-sm text-gray-900 flex items-center">
+                                                    <span class="w-3 h-3 rounded-full mr-2" style="background-color: {{ $category->color }}"></span>
+                                                    {{ $category->name }}
+                                                </span>
+                                            </label>
+                                        @endforeach
+                                    </div>
+                                    <p class="mt-1 text-sm text-gray-500">Select which categories to include or exclude from the events listing</p>
+                                </div>
+                                
+                                <div>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" name="content[show_past]" value="1" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500" {{ old('content.show_past') ? 'checked' : '' }}>
+                                        <span class="ml-2 text-sm text-gray-600">Include past events</span>
+                                    </label>
+                                </div>
                             </div>
                         </div>
 
@@ -272,11 +307,35 @@
                     targetField.style.display = 'block';
                 }
             }
+            
+            // Update category filter for events
+            if (type === 'events') {
+                updateCategoryFilter();
+            }
+        }
+        
+        function updateCategoryFilter() {
+            const filterType = document.getElementById('category_filter');
+            const categorySelection = document.getElementById('category-selection');
+            
+            if (filterType && categorySelection) {
+                if (filterType.value === 'specific' || filterType.value === 'exclude') {
+                    categorySelection.style.display = 'block';
+                } else {
+                    categorySelection.style.display = 'none';
+                }
+            }
         }
         
         // Initial load
         document.addEventListener('DOMContentLoaded', function() {
             toggleContentFields();
+            
+            // Add event listener for category filter
+            const categoryFilter = document.getElementById('category_filter');
+            if (categoryFilter) {
+                categoryFilter.addEventListener('change', updateCategoryFilter);
+            }
         });
     </script>
     @endpush

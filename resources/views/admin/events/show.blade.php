@@ -58,13 +58,10 @@
                                             <div class="text-xs text-gray-500 mt-1">
                                                 Max {{ $event->category->max_registrations_per_user }} registrations per user
                                             </div>
-                                            @if($event->category->description)
-                                                <div class="text-xs text-gray-500 mt-1">{{ $event->category->description }}</div>
-                                            @endif
                                         </dd>
                                     </div>
                                 @endif
-                                <div>
+                                <div class="w-full">
                                     <dt class="text-sm font-medium text-gray-500">Description</dt>
                                     <dd class="text-sm text-gray-900">{{ $event->description }}</dd>
                                 </div>

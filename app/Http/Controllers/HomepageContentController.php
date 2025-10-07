@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\HomepageContentBlock;
+use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\JsonResponse;
@@ -26,7 +27,8 @@ class HomepageContentController extends Controller
      */
     public function create(): View
     {
-        return view('admin.homepage-content.create');
+        $categories = Category::active()->orderBy('name')->get();
+        return view('admin.homepage-content.create', compact('categories'));
     }
 
     /**
@@ -69,7 +71,8 @@ class HomepageContentController extends Controller
      */
     public function edit(HomepageContentBlock $contentBlock): View
     {
-        return view('admin.homepage-content.edit', compact('contentBlock'));
+        $categories = Category::active()->orderBy('name')->get();
+        return view('admin.homepage-content.edit', compact('contentBlock', 'categories'));
     }
 
     /**
@@ -119,6 +122,8 @@ class HomepageContentController extends Controller
                 $content = array_merge($content, [
                     'limit' => (int)($validated['content']['limit'] ?? 6),
                     'show_past' => isset($validated['content']['show_past']),
+                    'category_filter' => $validated['content']['category_filter'] ?? 'all',
+                    'selected_categories' => $validated['content']['selected_categories'] ?? [],
                 ]);
                 break;
             case 'html':

@@ -115,4 +115,40 @@ class HomepageContentBlock extends Model
             default => ucfirst($this->type),
         };
     }
+
+    /**
+     * Get filtered events for events blocks
+     */
+    public function getFilteredEvents()
+    {
+        if ($this->type !== 'events') {
+            return collect();
+        }
+
+        $query = \App\Models\Event::query();
+
+        // Apply category filtering
+        $categoryFilter = $this->content['category_filter'] ?? 'all';
+        $selectedCategories = $this->content['selected_categories'] ?? [];
+
+        if ($categoryFilter === 'specific' && !empty($selectedCategories)) {
+            $query->whereIn('category_id', $selectedCategories);
+        } elseif ($categoryFilter === 'exclude' && !empty($selectedCategories)) {
+            $query->whereNotIn('category_id', $selectedCategories);
+        }
+
+        // Filter by date unless show_past is enabled
+        $showPast = $this->content['show_past'] ?? false;
+        if (!$showPast) {
+            $query->where('date', '>=', now()->startOfDay());
+        }
+
+        // Apply limit
+        $limit = $this->content['limit'] ?? 6;
+        
+        return $query->with(['category'])
+            ->orderBy('date')
+            ->limit($limit)
+            ->get();
+    }
 }
