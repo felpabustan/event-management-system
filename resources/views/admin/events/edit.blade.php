@@ -62,6 +62,25 @@
                                 <x-input-error class="mt-2" :messages="$errors->get('description')" />
                             </div>
 
+                            <!-- Category -->
+                            <div>
+                                <x-input-label for="category_id" :value="__('Category (Optional)')" />
+                                <select id="category_id" name="category_id" class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
+                                    <option value="">-- Select a Category --</option>
+                                    @foreach($categories as $category)
+                                        <option value="{{ $category->id }}" 
+                                                {{ old('category_id', $event->category_id) == $category->id ? 'selected' : '' }}
+                                                style="color: {{ $category->color }}">
+                                            {{ $category->name }} (Max {{ $category->max_registrations_per_user }} per user)
+                                        </option>
+                                    @endforeach
+                                </select>
+                                <p class="mt-1 text-sm text-gray-500">
+                                    Categories help organize events and limit how many events of the same type a user can register for.
+                                </p>
+                                <x-input-error class="mt-2" :messages="$errors->get('category_id')" />
+                            </div>
+
                             <!-- Pricing Section -->
                             <div class="border-t pt-6">
                                 <h3 class="text-lg font-medium text-gray-900 mb-4">Event Pricing</h3>

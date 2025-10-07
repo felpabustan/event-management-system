@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Event;
+use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Illuminate\Http\RedirectResponse;
@@ -15,7 +16,7 @@ class EventController extends Controller
      */
     public function index(): View
     {
-        $events = Event::orderBy('date', 'asc')->paginate(10);
+        $events = Event::with('category')->orderBy('date', 'asc')->paginate(10);
         return view('admin.events.index', compact('events'));
     }
 
@@ -24,7 +25,8 @@ class EventController extends Controller
      */
     public function create(): View
     {
-        return view('admin.events.create');
+        $categories = Category::active()->orderBy('name')->get();
+        return view('admin.events.create', compact('categories'));
     }
 
     /**
@@ -38,6 +40,7 @@ class EventController extends Controller
             'time' => 'required|date_format:H:i',
             'venue' => 'required|string|max:255',
             'description' => 'required|string',
+            'category_id' => 'nullable|exists:categories,id',
             'max_capacity' => 'required|integer|min:1',
             'is_paid' => 'nullable|boolean',
             'price' => 'nullable|numeric|min:0|required_if:is_paid,1',
@@ -66,6 +69,7 @@ class EventController extends Controller
      */
     public function show(Event $event): View
     {
+        $event->load('category');
         $registrations = $event->registrations()->orderBy('created_at', 'desc')->get();
         return view('admin.events.show', compact('event', 'registrations'));
     }
@@ -75,7 +79,8 @@ class EventController extends Controller
      */
     public function edit(Event $event): View
     {
-        return view('admin.events.edit', compact('event'));
+        $categories = Category::active()->orderBy('name')->get();
+        return view('admin.events.edit', compact('event', 'categories'));
     }
 
     /**
@@ -89,6 +94,7 @@ class EventController extends Controller
             'time' => 'required|date_format:H:i',
             'venue' => 'required|string|max:255',
             'description' => 'required|string',
+            'category_id' => 'nullable|exists:categories,id',
             'max_capacity' => 'required|integer|min:1|min:' . $event->current_capacity,
             'is_paid' => 'nullable|boolean',
             'price' => 'nullable|numeric|min:0|required_if:is_paid,1',

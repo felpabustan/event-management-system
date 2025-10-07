@@ -20,6 +20,9 @@ class PaymentController extends Controller
 
     public function createCheckoutSession(Event $event, Request $request)
     {
+        // Load category relationship
+        $event->load('category');
+        
         // Validate that the event is paid
         if ($event->isFree()) {
             return redirect()->route('events.register', $event)
@@ -43,6 +46,18 @@ class PaymentController extends Controller
         if ($event->isFull()) {
             return redirect()->route('events.public.show', $event)
                 ->with('error', 'Sorry, this event is full!');
+        }
+
+        // Check category registration limits for guest users
+        if ($event->category) {
+            if (!$event->category->canGuestRegister($validated['email'])) {
+                $remaining = $event->category->getRemainingGuestSlots($validated['email']);
+                return redirect()->route('events.public.show', $event)->with('error', 
+                    "You have reached the maximum number of registrations for {$event->category->name} events. " .
+                    "You can register for up to {$event->category->max_registrations_per_user} events in this category. " .
+                    "You have {$remaining} slots remaining."
+                );
+            }
         }
 
         try {

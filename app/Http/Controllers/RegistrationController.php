@@ -21,7 +21,8 @@ class RegistrationController extends Controller
      */
     public function index(): View
     {
-        $events = \App\Models\Event::where('date', '>=', now()->toDateString())
+        $events = \App\Models\Event::with('category')
+            ->where('date', '>=', now()->toDateString())
             ->orderBy('date', 'asc')
             ->get();
             
@@ -36,6 +37,8 @@ class RegistrationController extends Controller
      */
     public function show(\App\Models\Event $event): View
     {
+        // Load category relationship
+        $event->load('category');
         return view('public.events.show', compact('event'));
     }
 
@@ -60,6 +63,18 @@ class RegistrationController extends Controller
             'email' => 'required|email|max:255|unique:registrations,email,NULL,id,event_id,' . $event->id,
             'phone' => 'nullable|string|max:20',
         ]);
+
+        // Check category registration limits for guest users
+        if ($event->category) {
+            if (!$event->category->canGuestRegister($validated['email'])) {
+                $remaining = $event->category->getRemainingGuestSlots($validated['email']);
+                return back()->with('error', 
+                    "You have reached the maximum number of registrations for {$event->category->name} events. " .
+                    "You can register for up to {$event->category->max_registrations_per_user} events in this category. " .
+                    "You have {$remaining} slots remaining."
+                );
+            }
+        }
 
         try {
             DB::transaction(function () use ($validated, $event) {
@@ -91,11 +106,47 @@ class RegistrationController extends Controller
             });
 
             return redirect()->route('events.public.show', $event)
-                ->with('success', 'Registration successful! You will receive a confirmation email shortly.');
-
+                ->with('success', 'Registration successful! Check your email for confirmation.');
         } catch (\Exception $e) {
             Log::error('Registration failed: ' . $e->getMessage());
             return back()->with('error', 'Registration failed. Please try again.');
         }
+    }
+
+    /**
+     * Check category registration status for a given email (AJAX endpoint)
+     */
+    public function checkCategoryStatus(Request $request, \App\Models\Event $event)
+    {
+        $request->validate([
+            'email' => 'required|email'
+        ]);
+
+        $email = $request->input('email');
+        
+        if (!$event->category) {
+            return response()->json([
+                'has_category' => false,
+                'can_register' => true,
+                'message' => null
+            ]);
+        }
+
+        $canRegister = $event->category->canGuestRegister($email);
+        $remaining = $event->category->getRemainingGuestSlots($email);
+        $totalRegistrations = $event->category->getGuestRegistrationCount($email);
+
+        return response()->json([
+            'has_category' => true,
+            'category_name' => $event->category->name,
+            'category_color' => $event->category->color,
+            'max_registrations' => $event->category->max_registrations_per_user,
+            'current_registrations' => $totalRegistrations,
+            'remaining_slots' => $remaining,
+            'can_register' => $canRegister,
+            'message' => $canRegister 
+                ? "You can register for {$remaining} more {$event->category->name} events."
+                : "You have reached the maximum limit of {$event->category->max_registrations_per_user} registrations for {$event->category->name} events."
+        ]);
     }
 }

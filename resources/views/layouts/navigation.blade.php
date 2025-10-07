@@ -18,6 +18,9 @@
                     <x-nav-link :href="route('events.index')" :active="request()->routeIs('events.*')">
                         Events
                     </x-nav-link>
+                    <x-nav-link :href="route('admin.categories.index')" :active="request()->routeIs('admin.categories.*')">
+                        Categories
+                    </x-nav-link>
                     <x-nav-link :href="route('homepage-content.index')" :active="request()->routeIs('homepage-content.*')">
                         Homepage Builder
                     </x-nav-link>
@@ -81,6 +84,9 @@
                     </x-responsive-nav-link>
                     <x-responsive-nav-link :href="route('events.index')" :active="request()->routeIs('events.*')">
                         Events
+                    </x-responsive-nav-link>
+                    <x-responsive-nav-link :href="route('admin.categories.index')" :active="request()->routeIs('admin.categories.*')">
+                        Categories
                     </x-responsive-nav-link>
                     <x-responsive-nav-link :href="route('homepage-content.index')" :active="request()->routeIs('homepage-content.*')">
                         Content

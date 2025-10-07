@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Carbon\Carbon;
 
 class Event extends Model
@@ -14,6 +15,7 @@ class Event extends Model
         'time',
         'venue',
         'description',
+        'category_id',
         'max_capacity',
         'current_capacity',
         'is_paid',
@@ -30,6 +32,11 @@ class Event extends Model
     public function registrations(): HasMany
     {
         return $this->hasMany(Registration::class);
+    }
+
+    public function category(): BelongsTo
+    {
+        return $this->belongsTo(Category::class);
     }
 
     public function isFull(): bool

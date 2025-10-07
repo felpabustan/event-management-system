@@ -10,6 +10,7 @@ use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\CheckInController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\RegistrationController as AdminRegistrationController;
+use App\Http\Controllers\Admin\CategoryController;
 use Illuminate\Support\Facades\Route;
 
 // Public routes
@@ -17,6 +18,7 @@ Route::get('/', [RegistrationController::class, 'index'])->name('home');
 Route::get('/events', [RegistrationController::class, 'index'])->name('events.public.index');
 Route::get('/events/{event}', [RegistrationController::class, 'show'])->name('events.public.show');
 Route::post('/events/{event}/register', [RegistrationController::class, 'store'])->name('events.register');
+Route::post('/events/{event}/check-category-status', [RegistrationController::class, 'checkCategoryStatus'])->name('events.check.category');
 
 // Payment routes
 Route::post('/events/{event}/payment/checkout', [PaymentController::class, 'createCheckoutSession'])
@@ -40,6 +42,19 @@ Route::middleware(['auth', 'verified'])->group(function () {
         'edit' => 'events.edit',
         'update' => 'events.update',
         'destroy' => 'events.destroy',
+    ]);
+    
+    // Category management
+    Route::resource('/admin/categories', CategoryController::class, [
+        'names' => [
+            'index' => 'admin.categories.index',
+            'create' => 'admin.categories.create',
+            'store' => 'admin.categories.store',
+            'show' => 'admin.categories.show',
+            'edit' => 'admin.categories.edit',
+            'update' => 'admin.categories.update',
+            'destroy' => 'admin.categories.destroy',
+        ]
     ]);
     
     // Export registrations
