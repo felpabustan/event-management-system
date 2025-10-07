@@ -19,16 +19,13 @@
                         Events
                     </x-nav-link>
                     <x-nav-link :href="route('homepage-content.index')" :active="request()->routeIs('homepage-content.*')">
-                        Content
+                        Homepage Builder
                     </x-nav-link>
                     @if(Auth::user()->isSuperAdmin())
                         <x-nav-link :href="route('admin.users.index')" :active="request()->routeIs('admin.users.*')">
                             Users
                         </x-nav-link>
                     @endif
-                    {{-- <x-nav-link :href="route('homepage-settings.index')" :active="request()->routeIs('homepage-settings.*')">
-                        Settings
-                    </x-nav-link> --}}
                 </div>
             </div>
 
