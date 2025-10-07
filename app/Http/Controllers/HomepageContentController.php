@@ -135,35 +135,27 @@ class HomepageContentController extends Controller
             // Delete old hero image if exists
             if (isset($contentBlock->content['image'])) {
                 Storage::disk('public')->delete($contentBlock->content['image']);
-                Log::info('Deleted old hero image:', ['path' => $contentBlock->content['image']]);
             }
             
             $file = $request->file('hero_image');
             $path = $file->store('hero-images', 'public');
             $content['image'] = $path;
             
-            Log::info('Hero Image Uploaded:', ['path' => $path]);
         } elseif ($validated['type'] === 'hero') {
-            Log::info('No hero image file uploaded, keeping existing image');
         }
         
         if ($validated['type'] === 'image' && $request->hasFile('image_file')) {
             // Delete old image if exists
             if (isset($contentBlock->content['image'])) {
                 Storage::disk('public')->delete($contentBlock->content['image']);
-                Log::info('Deleted old content image:', ['path' => $contentBlock->content['image']]);
             }
             
             $file = $request->file('image_file');
             $path = $file->store('content-images', 'public');
             $content['image'] = $path;
             
-            Log::info('Content Image Uploaded:', ['path' => $path]);
         } elseif ($validated['type'] === 'image') {
-            Log::info('No image file uploaded, keeping existing image:', ['existing' => $contentBlock->content['image'] ?? 'none']);
         }
-
-        Log::info('Final content before save:', ['content' => $content]);
 
         $contentBlock->update([
             'title' => $validated['title'],
@@ -204,14 +196,10 @@ class HomepageContentController extends Controller
                 'blocks.*.sort_order' => 'required|integer',
             ]);
 
-            Log::info('Updating homepage content block order:', ['blocks' => $validated['blocks']]);
-
             foreach ($validated['blocks'] as $blockData) {
                 HomepageContentBlock::where('id', $blockData['id'])
                     ->update(['sort_order' => $blockData['sort_order']]);
             }
-
-            Log::info('Homepage content block order updated successfully');
 
             return response()->json([
                 'success' => true,

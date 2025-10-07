@@ -6,7 +6,6 @@ use App\Models\Event;
 use App\Models\Registration;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
 
 class CheckInController extends Controller
 {
@@ -33,12 +32,6 @@ class CheckInController extends Controller
     {
         $token = $request->input('token') ?? $request->route('token');
 
-        Log::info('QR Check-in attempt', [
-            'event_id' => $event->id,
-            'token' => $token,
-            'request_body' => $request->all()
-        ]);
-
         if (!$token) {
             return response()->json([
                 'success' => false,
@@ -49,12 +42,6 @@ class CheckInController extends Controller
         $registration = Registration::where('qr_code_token', $token)
             ->where('event_id', $event->id)
             ->first();
-
-        Log::info('Registration lookup result', [
-            'token' => $token,
-            'event_id' => $event->id,
-            'registration_found' => $registration ? $registration->id : null
-        ]);
 
         if (!$registration) {
             return response()->json([

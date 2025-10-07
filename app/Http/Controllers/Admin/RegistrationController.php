@@ -47,10 +47,6 @@ class RegistrationController extends Controller
             // Send email to the registrant
             if ($registration->email) {
                 Mail::to($registration->email)->send(new RegistrationCancelled($registrationData));
-                Log::info('Cancellation email sent to registrant', [
-                    'registration_id' => $registration->id,
-                    'email' => $registration->email
-                ]);
             }
 
             // Send email to all admin users
@@ -59,11 +55,6 @@ class RegistrationController extends Controller
                 Mail::to($admin->email)->send(new AdminRegistrationCancelled($registrationData));
             }
             
-            Log::info('Admin notification emails sent', [
-                'registration_id' => $registration->id,
-                'admin_count' => $adminUsers->count()
-            ]);
-
             // Delete the registration
             $registration->delete();
 
