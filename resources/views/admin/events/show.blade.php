@@ -31,7 +31,7 @@
             <!-- Event Details -->
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
                 <div class="p-6">
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="grid grid-cols-1 lg:grid-cols-4 gap-4">
                         <div>
                             <h3 class="text-lg font-medium text-gray-900 mb-4">Event Information</h3>
                             <dl class="space-y-3">
@@ -63,72 +63,11 @@
                                 @endif
                                 <div class="w-full">
                                     <dt class="text-sm font-medium text-gray-500">Description</dt>
-                                    <dd class="text-sm text-gray-900">{{ $event->description }}</dd>
+                                    <dd class="text-sm text-gray-900">{{ Str::limit($event->description, 200) }}</dd>
                                 </div>
                             </dl>
                         </div>
-                        <div>
-                            <h3 class="text-lg font-medium text-gray-900 mb-4">Registration Status</h3>
-                            <dl class="space-y-3">
-                                <div>
-                                    <dt class="text-sm font-medium text-gray-500">Current Registrations</dt>
-                                    <dd class="text-sm text-gray-900">{{ $event->current_capacity }} / {{ $event->max_capacity }}</dd>
-                                </div>
-                                <div>
-                                    <dt class="text-sm font-medium text-gray-500">Available Spots</dt>
-                                    <dd class="text-sm text-gray-900">{{ $event->availableSpots() }}</dd>
-                                </div>
-                                <div>
-                                    <dt class="text-sm font-medium text-gray-500">Status</dt>
-                                    <dd>
-                                        @if($event->isFull())
-                                            <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">Full</span>
-                                        @elseif($event->date < now()->toDateString())
-                                            <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800">Past Event</span>
-                                        @else
-                                            <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">Open for Registration</span>
-                                        @endif
-                                    </dd>
-                                </div>
-                                <div>
-                                    <dt class="text-sm font-medium text-gray-500">Capacity Progress</dt>
-                                    <dd>
-                                        <div class="w-full bg-gray-200 rounded-full h-2 mt-1">
-                                            <div class="bg-blue-600 h-2 rounded-full" style="width: {{ $event->max_capacity > 0 ? ($event->current_capacity / $event->max_capacity) * 100 : 0 }}%"></div>
-                                        </div>
-                                        <p class="text-xs text-gray-500 mt-1">{{ $event->max_capacity > 0 ? round(($event->current_capacity / $event->max_capacity) * 100, 1) : 0 }}% filled</p>
-                                    </dd>
-                                </div>
-                            </dl>
-                        </div>
-                        <div>
-                            <h3 class="text-lg font-medium text-gray-900 mb-4">Check-in Status</h3>
-                            <dl class="space-y-3">
-                                <div>
-                                    <dt class="text-sm font-medium text-gray-500">Checked In</dt>
-                                    <dd class="text-sm text-gray-900">{{ $registrations->where('checked_in', true)->count() }} / {{ $registrations->count() }}</dd>
-                                </div>
-                                <div>
-                                    <dt class="text-sm font-medium text-gray-500">Not Checked In</dt>
-                                    <dd class="text-sm text-gray-900">{{ $registrations->where('checked_in', false)->count() }}</dd>
-                                </div>
-                                <div>
-                                    <dt class="text-sm font-medium text-gray-500">Check-in Rate</dt>
-                                    <dd class="text-sm text-gray-900">
-                                        {{ $registrations->count() > 0 ? round(($registrations->where('checked_in', true)->count() / $registrations->count()) * 100, 1) : 0 }}%
-                                    </dd>
-                                </div>
-                                <div>
-                                    <dt class="text-sm font-medium text-gray-500">Check-in Progress</dt>
-                                    <dd>
-                                        <div class="w-full bg-gray-200 rounded-full h-2 mt-1">
-                                            <div class="bg-green-600 h-2 rounded-full" style="width: {{ $registrations->count() > 0 ? ($registrations->where('checked_in', true)->count() / $registrations->count()) * 100 : 0 }}%"></div>
-                                        </div>
-                                        <p class="text-xs text-gray-500 mt-1">{{ $registrations->count() > 0 ? round(($registrations->where('checked_in', true)->count() / $registrations->count()) * 100, 1) : 0 }}% checked in</p>
-                                    </dd>
-                                </div>
-                            </dl>
-                        </div>
+                        
                         <div>
                             <h3 class="text-lg font-medium text-gray-900 mb-4">Pricing Information</h3>
                             <dl class="space-y-3">
@@ -158,6 +97,70 @@
                                         <dd class="text-sm text-gray-900">{{ $registrations->where('payment_status', 'paid')->count() }}</dd>
                                     </div>
                                 @endif
+                            </dl>
+                        </div>
+                        
+                        <div>
+                            <h3 class="text-lg font-medium text-gray-900 mb-4">Registration Status</h3>
+                            <dl class="space-y-3">
+                                <div>
+                                    <dt class="text-sm font-medium text-gray-500">Current Registrations</dt>
+                                    <dd class="text-sm text-gray-900">{{ $event->current_capacity }} / {{ $event->max_capacity }}</dd>
+                                </div>
+                                <div>
+                                    <dt class="text-sm font-medium text-gray-500">Available Spots</dt>
+                                    <dd class="text-sm text-gray-900">{{ $event->availableSpots() }}</dd>
+                                </div>
+                                <div>
+                                    <dt class="text-sm font-medium text-gray-500">Status</dt>
+                                    <dd>
+                                        @if($event->isFull())
+                                            <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">Full</span>
+                                        @elseif($event->date < now()->toDateString())
+                                            <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800">Past Event</span>
+                                        @else
+                                            <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">Open for Registration</span>
+                                        @endif
+                                    </dd>
+                                </div>
+                                <div>
+                                    <dt class="text-sm font-medium text-gray-500">Capacity Progress</dt>
+                                    <dd>
+                                        <div class="w-24 bg-gray-200 rounded-full h-2 mt-1">
+                                            <div class="bg-blue-600 h-2 rounded-full" style="width: {{ $event->max_capacity > 0 ? ($event->current_capacity / $event->max_capacity) * 100 : 0 }}%"></div>
+                                        </div>
+                                        <p class="text-xs text-gray-500 mt-1">{{ $event->max_capacity > 0 ? round(($event->current_capacity / $event->max_capacity) * 100, 1) : 0 }}% filled</p>
+                                    </dd>
+                                </div>
+                            </dl>
+                        </div>
+                        
+                        <div>
+                            <h3 class="text-lg font-medium text-gray-900 mb-4">Check-in Status</h3>
+                            <dl class="space-y-3">
+                                <div>
+                                    <dt class="text-sm font-medium text-gray-500">Checked In</dt>
+                                    <dd class="text-sm text-gray-900">{{ $registrations->where('checked_in', true)->count() }} / {{ $registrations->count() }}</dd>
+                                </div>
+                                <div>
+                                    <dt class="text-sm font-medium text-gray-500">Not Checked In</dt>
+                                    <dd class="text-sm text-gray-900">{{ $registrations->where('checked_in', false)->count() }}</dd>
+                                </div>
+                                <div>
+                                    <dt class="text-sm font-medium text-gray-500">Check-in Rate</dt>
+                                    <dd class="text-sm text-gray-900">
+                                        {{ $registrations->count() > 0 ? round(($registrations->where('checked_in', true)->count() / $registrations->count()) * 100, 1) : 0 }}%
+                                    </dd>
+                                </div>
+                                <div>
+                                    <dt class="text-sm font-medium text-gray-500">Check-in Progress</dt>
+                                    <dd>
+                                        <div class="w-24 bg-gray-200 rounded-full h-2 mt-1">
+                                            <div class="bg-green-600 h-2 rounded-full" style="width: {{ $registrations->count() > 0 ? ($registrations->where('checked_in', true)->count() / $registrations->count()) * 100 : 0 }}%"></div>
+                                        </div>
+                                        <p class="text-xs text-gray-500 mt-1">{{ $registrations->count() > 0 ? round(($registrations->where('checked_in', true)->count() / $registrations->count()) * 100, 1) : 0 }}% checked in</p>
+                                    </dd>
+                                </div>
                             </dl>
                         </div>
                     </div>
