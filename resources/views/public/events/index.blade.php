@@ -191,22 +191,22 @@
                                                 </div>
                                                 <div class="ml-4 flex-1">
                                                     <h3 class="text-lg font-medium text-gray-900">{{ $event->title }}</h3>
-                                                    <p class="text-sm text-gray-500">{{ $event->venue }}</p>
+                                                    {{-- <p class="text-sm text-gray-500">{{ $event->venue }}</p>
                                                     @if($event->category)
                                                         <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full mt-1" style="background-color: {{ $event->category->color }}20; color: {{ $event->category->color }}">
                                                             {{ $event->category->name }}
                                                         </span>
-                                                    @endif
+                                                    @endif --}}
                                                 </div>
                                             </div>
 
                                             <div class="mt-4">
-                                                <div class="flex items-center text-sm text-gray-500 mb-2">
+                                                {{-- <div class="flex items-center text-sm text-gray-500 mb-2">
                                                     <svg class="flex-shrink-0 mr-1.5 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                                                     </svg>
                                                     {{ $event->date->format('M j, Y') }} at {{ \Carbon\Carbon::createFromFormat('H:i:s', $event->time)->format('g:i A') }}
-                                                </div>
+                                                </div> --}}
                                                 
                                                 <p class="text-sm text-gray-600 mb-4">{{ Str::limit($event->description, 100) }}</p>
                                                 
@@ -227,9 +227,9 @@
                                             </div>
 
                                             <div class="mt-6 flex space-x-3">
-                                                <a href="{{ route('events.public.show', $event) }}" class="flex-1 bg-indigo-600 text-white text-center py-3 px-4 rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition duration-150 ease-in-out block font-semibold shadow-lg">
+                                                {{-- <a href="{{ route('events.public.show', $event) }}" class="flex-1 bg-indigo-600 text-white text-center py-3 px-4 rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition duration-150 ease-in-out block font-semibold shadow-lg">
                                                     View Details
-                                                </a>
+                                                </a> --}}
                                                 @if(!$event->isFull())
                                                     <a href="{{ route('events.public.show', $event) }}" class="flex-1 bg-emerald-600 text-white text-center py-3 px-4 rounded-lg hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 transition duration-150 ease-in-out block font-semibold shadow-lg">
                                                         Register Now

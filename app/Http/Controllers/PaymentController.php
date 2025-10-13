@@ -61,9 +61,20 @@ class PaymentController extends Controller
         }
 
         try {
-            $session = Session::create([
-                'payment_method_types' => ['card'],
-                'line_items' => [
+            // Prepare line items based on whether we have a Stripe Price ID
+            $lineItems = [];
+            
+            if ($event->stripe_price_id) {
+                // Use existing Stripe Price ID
+                $lineItems = [
+                    [
+                        'price' => $event->stripe_price_id,
+                        'quantity' => 1,
+                    ],
+                ];
+            } else {
+                // Create price data dynamically (fallback)
+                $lineItems = [
                     [
                         'price_data' => [
                             'currency' => strtolower($event->currency),
@@ -75,12 +86,21 @@ class PaymentController extends Controller
                         ],
                         'quantity' => 1,
                     ],
-                ],
+                ];
+            }
+
+            $session = Session::create([
+                'payment_method_types' => ['card'],
+                'line_items' => $lineItems,
                 'mode' => 'payment',
                 'success_url' => route('payment.success', ['event' => $event->id]) . '?session_id={CHECKOUT_SESSION_ID}',
                 'cancel_url' => route('events.public.show', $event),
                 'metadata' => [
                     'event_id' => $event->id,
+                    'event_title' => $event->title,
+                    'event_date' => $event->date->format('Y-m-d'),
+                    'event_time' => $event->time,
+                    'event_venue' => $event->venue,
                     'user_email' => $validated['email'],
                     'user_name' => $validated['name'],
                     'user_phone' => $validated['phone'] ?? '',

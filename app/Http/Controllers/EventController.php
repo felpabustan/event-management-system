@@ -45,6 +45,7 @@ class EventController extends Controller
             'is_paid' => 'nullable|boolean',
             'price' => 'nullable|numeric|min:0|required_if:is_paid,1',
             'currency' => 'nullable|string|max:3|required_if:is_paid,1',
+            'stripe_price_id' => 'nullable|string|max:255',
         ]);
 
         // Set default values for pricing
@@ -53,6 +54,7 @@ class EventController extends Controller
         if (!$validated['is_paid']) {
             $validated['price'] = null;
             $validated['currency'] = null;
+            $validated['stripe_price_id'] = null;
         } else {
             // Ensure currency has a default value if not provided
             $validated['currency'] = $validated['currency'] ?? 'USD';
@@ -99,6 +101,7 @@ class EventController extends Controller
             'is_paid' => 'nullable|boolean',
             'price' => 'nullable|numeric|min:0|required_if:is_paid,1',
             'currency' => 'nullable|string|max:3|required_if:is_paid,1',
+            'stripe_price_id' => 'nullable|string|max:255',
         ]);
 
         // Set default values for pricing
@@ -107,6 +110,7 @@ class EventController extends Controller
         if (!$validated['is_paid']) {
             $validated['price'] = null;
             $validated['currency'] = null;
+            $validated['stripe_price_id'] = null;
         } else {
             // Ensure currency has a default value if not provided
             $validated['currency'] = $validated['currency'] ?? 'USD';

@@ -16,9 +16,9 @@ class AdminUserSeeder extends Seeder
     {
         User::create([
             'name' => 'Admin User',
-            'email' => 'admin@eventmgmt.local',
+            'email' => 'fel@admin.com',
             'email_verified_at' => now(),
-            'password' => Hash::make('password123'),
+            'password' => Hash::make('password'),
             'role' => 'super_admin',
         ]);
     }

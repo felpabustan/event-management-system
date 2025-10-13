@@ -96,23 +96,35 @@
                                 </div>
 
                                 <!-- Price and Currency (shown when is_paid is checked) -->
-                                <div id="pricing-fields" class="grid grid-cols-1 md:grid-cols-2 gap-4" style="display: {{ old('is_paid', $event->is_paid) ? 'grid' : 'none' }};">
-                                    <div>
-                                        <x-input-label for="price" :value="__('Price')" />
-                                        <x-text-input id="price" name="price" type="number" step="0.01" min="0" class="mt-1 block w-full" :value="old('price', $event->price)" />
-                                        <x-input-error class="mt-2" :messages="$errors->get('price')" />
+                                <div id="pricing-fields" class="space-y-4" style="display: {{ old('is_paid', $event->is_paid) ? 'block' : 'none' }};">
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div>
+                                            <x-input-label for="price" :value="__('Price')" />
+                                            <x-text-input id="price" name="price" type="number" step="0.01" min="0" class="mt-1 block w-full" :value="old('price', $event->price)" />
+                                            <x-input-error class="mt-2" :messages="$errors->get('price')" />
+                                        </div>
+                                        <div>
+                                            <x-input-label for="currency" :value="__('Currency')" />
+                                            <select id="currency" name="currency" class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
+                                                <option value="SGD" {{ old('currency', $event->currency) == 'SGD' ? 'selected' : '' }}>SGD - Singaporean Dollar</option>
+                                                <option value="USD" {{ old('currency', $event->currency) == 'USD' ? 'selected' : '' }}>USD - US Dollar</option>
+                                                <option value="EUR" {{ old('currency', $event->currency) == 'EUR' ? 'selected' : '' }}>EUR - Euro</option>
+                                                <option value="GBP" {{ old('currency', $event->currency) == 'GBP' ? 'selected' : '' }}>GBP - British Pound</option>
+                                                <option value="CAD" {{ old('currency', $event->currency) == 'CAD' ? 'selected' : '' }}>CAD - Canadian Dollar</option>
+                                                <option value="AUD" {{ old('currency', $event->currency) == 'AUD' ? 'selected' : '' }}>AUD - Australian Dollar</option>
+                                            </select>
+                                            <x-input-error class="mt-2" :messages="$errors->get('currency')" />
+                                        </div>
                                     </div>
+                                    
+                                    <!-- Stripe Price ID -->
                                     <div>
-                                        <x-input-label for="currency" :value="__('Currency')" />
-                                        <select id="currency" name="currency" class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
-                                            <option value="SGD" {{ old('currency', $event->currency) == 'SGD' ? 'selected' : '' }}>SGD - Singaporean Dollar</option>
-                                            <option value="USD" {{ old('currency', $event->currency) == 'USD' ? 'selected' : '' }}>USD - US Dollar</option>
-                                            <option value="EUR" {{ old('currency', $event->currency) == 'EUR' ? 'selected' : '' }}>EUR - Euro</option>
-                                            <option value="GBP" {{ old('currency', $event->currency) == 'GBP' ? 'selected' : '' }}>GBP - British Pound</option>
-                                            <option value="CAD" {{ old('currency', $event->currency) == 'CAD' ? 'selected' : '' }}>CAD - Canadian Dollar</option>
-                                            <option value="AUD" {{ old('currency', $event->currency) == 'AUD' ? 'selected' : '' }}>AUD - Australian Dollar</option>
-                                        </select>
-                                        <x-input-error class="mt-2" :messages="$errors->get('currency')" />
+                                        <x-input-label for="stripe_price_id" :value="__('Stripe Price ID')" />
+                                        <x-text-input id="stripe_price_id" name="stripe_price_id" type="text" class="mt-1 block w-full" :value="old('stripe_price_id', $event->stripe_price_id)" placeholder="price_1234567890abcdef" />
+                                        <p class="mt-1 text-sm text-gray-500">
+                                            Enter the Stripe Price ID from your Stripe Dashboard (e.g., price_1234567890abcdef). This connects your event to your Stripe product.
+                                        </p>
+                                        <x-input-error class="mt-2" :messages="$errors->get('stripe_price_id')" />
                                     </div>
                                 </div>
                                 
@@ -159,12 +171,13 @@
 
             function togglePricingFields() {
                 if (isPaidCheckbox.checked) {
-                    pricingFields.style.display = 'grid';
+                    pricingFields.style.display = 'block';
                     priceInput.required = true;
                 } else {
                     pricingFields.style.display = 'none';
                     priceInput.required = false;
                     priceInput.value = '';
+                    document.getElementById('stripe_price_id').value = '';
                 }
             }
 

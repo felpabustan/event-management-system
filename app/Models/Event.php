@@ -21,6 +21,7 @@ class Event extends Model
         'is_paid',
         'price',
         'currency',
+        'stripe_price_id',
     ];
 
     protected $casts = [

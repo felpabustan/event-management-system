@@ -86,6 +86,12 @@
                                         <dt class="text-sm font-medium text-gray-500">Price</dt>
                                         <dd class="text-sm text-gray-900">{{ $event->getFormattedPriceAttribute() }}</dd>
                                     </div>
+                                    @if($event->stripe_price_id)
+                                        <div>
+                                            <dt class="text-sm font-medium text-gray-500">Stripe Price ID</dt>
+                                            <dd class="text-sm text-gray-900 font-mono">{{ $event->stripe_price_id }}</dd>
+                                        </div>
+                                    @endif
                                     <div>
                                         <dt class="text-sm font-medium text-gray-500">Total Revenue</dt>
                                         <dd class="text-sm text-gray-900">
