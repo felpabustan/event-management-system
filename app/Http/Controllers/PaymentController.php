@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Log;
 use Stripe\Stripe;
 use Stripe\Checkout\Session;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class PaymentController extends Controller
 {
@@ -131,9 +132,16 @@ class PaymentController extends Controller
                 $existingRegistration = Registration::where('stripe_session_id', $sessionId)->first();
                 
                 if ($existingRegistration) {
+                    // Generate SVG QR code (no imagick required)
+                    $qrCode = QrCode::format('svg')
+                        ->size(200)
+                        ->generate($existingRegistration->getQrCodeData());
+                    
                     return view('public.payment.success', [
                         'event' => $event, 
-                        'registration' => $existingRegistration
+                        'registration' => $existingRegistration,
+                        'qrCode' => $qrCode,
+                        'token' => $existingRegistration->qr_code_token
                     ]);
                 }
 
@@ -165,7 +173,17 @@ class PaymentController extends Controller
                     Log::warning('Failed to send registration emails: ' . $mailException->getMessage());
                 }
 
-                return view('public.payment.success', compact('event', 'registration'));
+                // Generate SVG QR code (no imagick required)
+                $qrCode = QrCode::format('svg')
+                    ->size(200)
+                    ->generate($registration->getQrCodeData());
+
+                return view('public.payment.success', [
+                    'event' => $event, 
+                    'registration' => $registration,
+                    'qrCode' => $qrCode,
+                    'token' => $registration->qr_code_token
+                ]);
             } else {
                 return redirect()->route('events.public.show', $event)
                     ->with('error', 'Payment was not completed successfully.');

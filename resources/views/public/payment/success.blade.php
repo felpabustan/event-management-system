@@ -74,12 +74,36 @@
             </div>
         </div>
 
+        @if(isset($qrCode) && isset($token))
+        <!-- QR Code for Check-in -->
+        <div class="bg-green-50 rounded-lg p-6 mb-6 text-center">
+            <h3 class="font-semibold text-gray-900 mb-4">Check-in QR Code</h3>
+            <p class="text-gray-600 mb-4">Please bring this QR code with you to the event for quick check-in:</p>
+            
+            <div class="mb-4 flex justify-center">
+                <div class="bg-white p-4 rounded-lg shadow-sm">
+                    {!! $qrCode !!}
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-lg p-3 mb-4 inline-block">
+                <p class="text-sm text-gray-600 mb-1">Check-in Token:</p>
+                <p class="font-mono text-lg font-bold text-gray-900">{{ $token }}</p>
+            </div>
+            
+            <p class="text-xs text-gray-500">
+                <strong>Important:</strong> This QR code is unique to your registration. Please do not share it with others.
+            </p>
+        </div>
+        @endif
+
         <!-- Next Steps -->
         <div class="bg-yellow-50 rounded-lg p-6 mb-6 text-left">
             <h3 class="font-semibold text-gray-900 mb-2">What's Next?</h3>
             <ul class="text-gray-600 space-y-1 text-sm">
                 <li>• You will receive a confirmation email shortly</li>
-                <li>• Please save this page or take a screenshot for your records</li>
+                <li>• <strong>Save this page or take a screenshot</strong> to keep your QR code</li>
+                <li>• Bring your QR code to the event for quick check-in</li>
                 <li>• If you have any questions, contact us at support@example.com</li>
             </ul>
         </div>
