@@ -31,8 +31,9 @@
                                     @csrf
                                     <button type="submit" class="text-gray-700 hover:text-gray-900">Logout</button>
                                 </form>
-                            @else
                                 <a href="{{ route('login') }}" class="text-gray-700 hover:text-gray-900">Admin Login</a>
+                            @else
+                                
                             @endauth
                         </div>
                     </div>
