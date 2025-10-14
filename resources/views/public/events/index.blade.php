@@ -169,7 +169,7 @@
                         @endphp
 
                         @if($limitedEvents->count() > 0)
-                            <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                            <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-2">
                                 @foreach($limitedEvents as $event)
                                     <div class="bg-white overflow-hidden shadow rounded-lg mt-6">
                                         <div class="p-6">
