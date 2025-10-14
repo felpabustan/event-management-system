@@ -24,8 +24,8 @@
                             <a href="{{ route('home') }}" class="text-2xl font-bold text-gray-900">{{ config('app.name') }}</a>
                         </div>
                         <div class="flex items-center space-x-4">
-                            <a href="{{ route('events.public.index') }}" class="text-gray-700 hover:text-gray-900">Events</a>
                             @auth
+                                <a href="{{ route('events.public.index') }}" class="text-gray-700 hover:text-gray-900">Events</a>
                                 <a href="{{ route('dashboard') }}" class="text-gray-700 hover:text-gray-900">Dashboard</a>
                                 <form method="POST" action="{{ route('logout') }}" class="inline">
                                     @csrf

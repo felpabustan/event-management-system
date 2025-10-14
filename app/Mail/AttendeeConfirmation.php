@@ -44,8 +44,8 @@ class AttendeeConfirmation extends Mailable
      */
     public function content(): Content
     {
-        // Generate QR code
-        $qrCode = QrCode::format('svg')
+        // Generate QR code as PNG for better email client compatibility
+        $qrCode = QrCode::format('png')
             ->size(200)
             ->generate($this->registration->getQrCodeData());
 
