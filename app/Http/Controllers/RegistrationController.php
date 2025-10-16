@@ -7,6 +7,7 @@ use App\Models\Registration;
 use App\Models\HomepageContentBlock;
 use App\Mail\AttendeeConfirmation;
 use App\Mail\AdminAlert;
+use App\Rules\RecaptchaRule;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
@@ -62,6 +63,7 @@ class RegistrationController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:registrations,email,NULL,id,event_id,' . $event->id,
             'phone' => 'nullable|string|max:20',
+            'g-recaptcha-response' => ['required', new RecaptchaRule],
         ]);
 
         // Check category registration limits for guest users

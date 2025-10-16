@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Log;
 use Stripe\Stripe;
 use Stripe\Checkout\Session;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use App\Rules\RecaptchaRule;
 
 class PaymentController extends Controller
 {
@@ -41,6 +42,7 @@ class PaymentController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:registrations,email,NULL,id,event_id,' . $event->id,
             'phone' => 'nullable|string|max:20',
+            'g-recaptcha-response' => ['required', new RecaptchaRule],
         ]);
 
         // Check if event is full
