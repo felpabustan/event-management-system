@@ -111,7 +111,7 @@
                 <li>• You will receive a confirmation email shortly</li>
                 <li>• <strong>Save this page or take a screenshot</strong> to keep your QR code</li>
                 <li>• Bring your QR code to the event for quick check-in</li>
-                <li>• If you have any questions, contact us at support@example.com</li>
+                <li>• If you have any questions, contact us at hello@beautyinsider.sg</li>
             </ul>
         </div>
 
