@@ -61,9 +61,9 @@ class RegistrationController extends Controller
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255|unique:registrations,email,NULL,id,event_id,' . $event->id,
+            'email' => 'required|email|unique:registrations,email,NULL,id,event_id,' . $event->id,
             'phone' => 'nullable|string|max:20',
-            'g-recaptcha-response' => ['required', new RecaptchaRule],
+            'recaptcha_token' => ['required', new RecaptchaRule()],
         ]);
 
         // Check category registration limits for guest users

@@ -38,11 +38,11 @@ class PaymentController extends Controller
         }
 
         // Validate registration data
-        $validated = $request->validate([
+                $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255|unique:registrations,email,NULL,id,event_id,' . $event->id,
+            'email' => 'required|email',
             'phone' => 'nullable|string|max:20',
-            'g-recaptcha-response' => ['required', new RecaptchaRule],
+            'recaptcha_token' => ['required', new RecaptchaRule()],
         ]);
 
         // Check if event is full
