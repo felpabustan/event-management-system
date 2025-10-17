@@ -113,7 +113,17 @@ class PaymentController extends Controller
 
             return redirect($session->url);
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Payment processing failed: ' . $e->getMessage());
+            Log::error('Payment processing failed in createCheckoutSession', [
+                'event_id' => $event->id,
+                'event_title' => $event->title,
+                'error_message' => $e->getMessage(),
+                'error_trace' => $e->getTraceAsString(),
+                'stripe_price_id' => $event->stripe_price_id ?? 'N/A',
+                'event_price' => $event->price ?? 'N/A',
+                'event_currency' => $event->currency ?? 'N/A'
+            ]);
+            
+            return redirect()->back()->with('error', 'Payment processing failed, please contact admin.');
         }
     }
 
