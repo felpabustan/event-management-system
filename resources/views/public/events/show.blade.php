@@ -322,7 +322,7 @@
                                                     <div>
                                                         <label for="payment_phone"
                                                             class="block text-sm font-medium text-gray-700">Phone
-                                                            Number (Optional)</label>
+                                                            Number</label>
                                                         <input type="tel" name="phone" id="payment_phone"
                                                             value="{{ old('phone') }}"
                                                             class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
