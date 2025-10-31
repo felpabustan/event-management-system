@@ -72,7 +72,10 @@ class EventController extends Controller
     public function show(Event $event): View
     {
         $event->load('category');
-        $registrations = $event->registrations()->orderBy('created_at', 'desc')->get();
+        $registrations = $event->registrations()
+            ->with(['checkedInBy', 'adminUser'])
+            ->orderBy('created_at', 'desc')
+            ->get();
         return view('admin.events.show', compact('event', 'registrations'));
     }
 
@@ -136,6 +139,87 @@ class EventController extends Controller
 
         return redirect()->route('events.index')
             ->with('success', 'Event deleted successfully!');
+    }
+
+    /**
+     * Show form to manually add registration to an event
+     */
+    public function showAddRegistration(Event $event): View
+    {
+        $event->load('category');
+        return view('admin.events.add-registration', compact('event'));
+    }
+
+    /**
+     * Store manual registration for an event
+     */
+    public function storeManualRegistration(Request $request, Event $event): RedirectResponse
+    {
+        // Check if event is full
+        if ($event->isFull()) {
+            return back()->with('error', 'Sorry, this event is full! Cannot add more registrations.');
+        }
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:registrations,email,NULL,id,event_id,' . $event->id,
+            'phone' => 'nullable|string|max:20',
+            'payment_status' => 'required|in:free,paid,pending',
+            'status' => 'required|in:confirmed,pending,cancelled',
+            'notes' => 'nullable|string|max:500',
+        ]);
+
+        // Check category registration limits for guest users
+        if ($event->category) {
+            if (!$event->category->canGuestRegister($validated['email'])) {
+                $remaining = $event->category->getRemainingGuestSlots($validated['email']);
+                return back()->with('error', 
+                    "This person has reached the maximum number of registrations for {$event->category->name} events. " .
+                    "They can register for up to {$event->category->max_registrations_per_user} events in this category. " .
+                    "They have {$remaining} slots remaining."
+                )->withInput();
+            }
+        }
+
+        // For paid events, ensure payment status is not 'free'
+        if (!$event->isFree() && $validated['payment_status'] === 'free') {
+            return back()->with('error', 'This is a paid event. Payment status cannot be "free".')
+                ->withInput();
+        }
+
+        // For free events, set payment status to 'free'
+        if ($event->isFree()) {
+            $validated['payment_status'] = 'free';
+        }
+
+        try {
+            \DB::transaction(function () use ($validated, $event) {
+                // Create registration
+                $registration = \App\Models\Registration::create([
+                    'event_id' => $event->id,
+                    'name' => $validated['name'],
+                    'email' => $validated['email'],
+                    'phone' => $validated['phone'] ?? null,
+                    'status' => $validated['status'],
+                    'payment_status' => $validated['payment_status'],
+                    'notes' => $validated['notes'] ?? null,
+                    'created_by_admin' => true,
+                    'admin_user_id' => Auth::id(),
+                ]);
+
+                // Only increment capacity if status is confirmed
+                if ($validated['status'] === 'confirmed') {
+                    $event->increment('current_capacity');
+                }
+            });
+
+            return redirect()->route('events.show', $event)
+                ->with('success', 'Registration added successfully!');
+        } catch (\Exception $e) {
+            \Log::error('Manual registration failed: ' . $e->getMessage());
+            return back()->with('error', 'Failed to add registration. Please try again.')
+                ->withInput();
+        }
     }
 
     /**

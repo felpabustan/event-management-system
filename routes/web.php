@@ -61,6 +61,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/admin/events/{event}/export', [EventController::class, 'exportRegistrations'])
         ->name('events.export');
     
+    // Manual Registration Management
+    Route::get('/admin/events/{event}/add-registration', [EventController::class, 'showAddRegistration'])
+        ->name('events.add-registration');
+    Route::post('/admin/events/{event}/add-registration', [EventController::class, 'storeManualRegistration'])
+        ->name('events.store-manual-registration');
+    
     // Check-in Management
     Route::get('/admin/events/{event}/checkin', [CheckInController::class, 'scanner'])
         ->name('admin.checkin.scanner');

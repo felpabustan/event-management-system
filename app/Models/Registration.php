@@ -21,11 +21,15 @@ class Registration extends Model
         'checked_in',
         'checked_in_at',
         'checked_in_by',
+        'notes',
+        'created_by_admin',
+        'admin_user_id',
     ];
 
     protected $casts = [
         'checked_in' => 'boolean',
         'checked_in_at' => 'datetime',
+        'created_by_admin' => 'boolean',
     ];
 
     public function event(): BelongsTo
@@ -36,6 +40,11 @@ class Registration extends Model
     public function checkedInBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'checked_in_by');
+    }
+
+    public function adminUser(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'admin_user_id');
     }
 
     /**
