@@ -212,7 +212,7 @@
                                                 
                                                 <div class="flex items-center justify-between mb-4">
                                                     <span class="text-sm text-gray-500">
-                                                        {{ $event->current_capacity }} / {{ $event->max_capacity }} registered
+                                                        {{ $event->availableSpots() }} slots left
                                                     </span>
                                                     @if($event->isFull())
                                                         <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">Full</span>
