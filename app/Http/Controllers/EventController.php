@@ -232,7 +232,7 @@ class EventController extends Controller
             abort(403, 'Only super admins can export registration data.');
         }
 
-        $filename = 'event_' . $event->id . '_registrations_' . date('Y-m-d') . '.csv';
+        $filename = $event->title. '_Registrations_' . date('Y-m-d') . '.csv';
         
         $headers = [
             'Content-Type' => 'text/csv',
