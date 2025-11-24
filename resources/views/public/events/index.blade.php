@@ -270,6 +270,81 @@
                         {!! $contentBlock->content['html'] !!}
                     @endif
                 </div>
+            @elseif($contentBlock->type === 'form')
+                <!-- Form Block -->
+                <div class="bg-white py-12">
+                    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <div class="bg-gray-50 rounded-lg shadow-lg p-8">
+                            @if(isset($contentBlock->content['form_title']) && $contentBlock->content['form_title'])
+                                <h2 class="text-3xl font-bold text-gray-900 mb-4 text-center">{{ $contentBlock->content['form_title'] }}</h2>
+                            @endif
+                            
+                            @if(isset($contentBlock->content['description']) && $contentBlock->content['description'])
+                                <p class="text-gray-600 mb-6 text-center">{{ $contentBlock->content['description'] }}</p>
+                            @endif
+
+                            @if(session('success'))
+                                <div class="mb-6 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
+                                    <span class="block sm:inline">{{ session('success') }}</span>
+                                </div>
+                            @endif
+
+                            @if(session('error'))
+                                <div class="mb-6 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+                                    <span class="block sm:inline">{{ session('error') }}</span>
+                                </div>
+                            @endif
+
+                            <form action="{{ route('form-submissions.submit', $contentBlock) }}" method="POST" class="space-y-6">
+                                @csrf
+                                
+                                @if(isset($contentBlock->content['fields']) && is_array($contentBlock->content['fields']))
+                                    @foreach($contentBlock->content['fields'] as $field)
+                                        <div>
+                                            <label for="field_{{ $field['id'] }}" class="block text-sm font-medium text-gray-700 mb-2">
+                                                {{ $field['label'] }}
+                                                @if($field['required'] ?? false)
+                                                    <span class="text-red-500">*</span>
+                                                @endif
+                                            </label>
+                                            
+                                            @if($field['type'] === 'textarea')
+                                                <textarea 
+                                                    id="field_{{ $field['id'] }}" 
+                                                    name="field_{{ $field['id'] }}" 
+                                                    rows="4"
+                                                    placeholder="{{ $field['placeholder'] ?? '' }}"
+                                                    {{ ($field['required'] ?? false) ? 'required' : '' }}
+                                                    class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                                >{{ old('field_' . $field['id']) }}</textarea>
+                                            @else
+                                                <input 
+                                                    type="{{ $field['type'] }}" 
+                                                    id="field_{{ $field['id'] }}" 
+                                                    name="field_{{ $field['id'] }}" 
+                                                    value="{{ old('field_' . $field['id']) }}"
+                                                    placeholder="{{ $field['placeholder'] ?? '' }}"
+                                                    {{ ($field['required'] ?? false) ? 'required' : '' }}
+                                                    class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                                >
+                                            @endif
+                                            
+                                            @error('field_' . $field['id'])
+                                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                            @enderror
+                                        </div>
+                                    @endforeach
+                                @endif
+
+                                <div class="pt-4">
+                                    <button type="submit" class="w-full inline-flex justify-center items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 ease-in-out">
+                                        {{ $contentBlock->content['submit_button_text'] ?? 'Submit' }}
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
             @endif
         @endforeach
         

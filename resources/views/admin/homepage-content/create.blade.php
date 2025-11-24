@@ -28,6 +28,7 @@
                                 <option value="image">Image Block</option>
                                 <option value="events">Events Listing</option>
                                 <option value="html">Custom HTML</option>
+                                <option value="form">Form Block</option>
                             </select>
                             @error('type')
                                 <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
@@ -266,6 +267,55 @@
                             </div>
                         </div>
 
+                        <!-- Form Block Fields -->
+                        <div id="form-fields" class="content-fields" style="display: none;">
+                            <h3 class="text-lg font-medium text-gray-900 mb-4">Form Builder</h3>
+                            
+                            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                                <p class="text-sm text-blue-800">Create a custom form to collect information. Perfect for email signups, event registrations, or waitlists. All submissions are saved to a CSV file that you can download.</p>
+                            </div>
+                            
+                            <div class="grid grid-cols-1 gap-6">
+                                <div>
+                                    <label for="form_title" class="block text-sm font-medium text-gray-700 mb-2">Form Title</label>
+                                    <input type="text" id="form_title" name="content[form_title]" class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" value="{{ old('content.form_title') }}" placeholder="Join Our Mailing List">
+                                </div>
+                                
+                                <div>
+                                    <label for="form_description" class="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                                    <textarea id="form_description" name="content[description]" rows="3" class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" placeholder="Sign up to receive updates about our upcoming events.">{{ old('content.description') }}</textarea>
+                                </div>
+
+                                <!-- Form Fields Builder -->
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Form Fields</label>
+                                    <div id="form-fields-container" class="space-y-4">
+                                        <!-- Fields will be added here dynamically -->
+                                    </div>
+                                    <button type="button" onclick="addFormField()" class="mt-3 inline-flex items-center px-4 py-2 bg-green-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-700">
+                                        + Add Field
+                                    </button>
+                                </div>
+
+                                <div>
+                                    <label for="submit_button_text" class="block text-sm font-medium text-gray-700 mb-2">Submit Button Text</label>
+                                    <input type="text" id="submit_button_text" name="content[submit_button_text]" class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" value="{{ old('content.submit_button_text', 'Submit') }}">
+                                </div>
+
+                                <div>
+                                    <label for="success_message" class="block text-sm font-medium text-gray-700 mb-2">Success Message</label>
+                                    <input type="text" id="success_message" name="content[success_message]" class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" value="{{ old('content.success_message', 'Thank you for your submission!') }}">
+                                </div>
+
+                                <div>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" name="content[collect_ip]" value="1" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500" {{ old('content.collect_ip') ? 'checked' : '' }}>
+                                        <span class="ml-2 text-sm text-gray-600">Collect IP addresses with submissions</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
                         <!-- Active Status -->
                         <div class="mb-6 mt-6">
                             <div class="flex items-center">
@@ -293,6 +343,59 @@
 
     @push('scripts')
     <script>
+        let fieldCounter = 0;
+
+        function addFormField() {
+            fieldCounter++;
+            const container = document.getElementById('form-fields-container');
+            const fieldHtml = `
+                <div class="border border-gray-300 rounded-lg p-4 bg-gray-50" id="field-${fieldCounter}">
+                    <div class="flex justify-between items-start mb-3">
+                        <h4 class="text-sm font-semibold text-gray-700">Field #${fieldCounter}</h4>
+                        <button type="button" onclick="removeFormField(${fieldCounter})" class="text-red-600 hover:text-red-800 text-sm">Remove</button>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-medium text-gray-600 mb-1">Field Type</label>
+                            <select name="content[fields][${fieldCounter}][type]" class="block w-full border-gray-300 rounded-md shadow-sm text-sm" required>
+                                <option value="text">Text</option>
+                                <option value="email">Email</option>
+                                <option value="tel">Phone</option>
+                                <option value="number">Number</option>
+                                <option value="textarea">Text Area</option>
+                                <option value="select">Dropdown</option>
+                                <option value="checkbox">Checkbox</option>
+                                <option value="radio">Radio Buttons</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-600 mb-1">Field Label</label>
+                            <input type="text" name="content[fields][${fieldCounter}][label]" class="block w-full border-gray-300 rounded-md shadow-sm text-sm" placeholder="e.g., Email Address" required>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-600 mb-1">Placeholder</label>
+                            <input type="text" name="content[fields][${fieldCounter}][placeholder]" class="block w-full border-gray-300 rounded-md shadow-sm text-sm" placeholder="e.g., your@email.com">
+                        </div>
+                        <div class="flex items-center">
+                            <label class="flex items-center">
+                                <input type="checkbox" name="content[fields][${fieldCounter}][required]" value="1" class="rounded border-gray-300 text-indigo-600 shadow-sm">
+                                <span class="ml-2 text-xs text-gray-600">Required field</span>
+                            </label>
+                        </div>
+                    </div>
+                    <input type="hidden" name="content[fields][${fieldCounter}][id]" value="${fieldCounter}">
+                </div>
+            `;
+            container.insertAdjacentHTML('beforeend', fieldHtml);
+        }
+
+        function removeFormField(id) {
+            const field = document.getElementById('field-' + id);
+            if (field) {
+                field.remove();
+            }
+        }
+
         function toggleContentFields() {
             const type = document.getElementById('type').value;
             const allFields = document.querySelectorAll('.content-fields');

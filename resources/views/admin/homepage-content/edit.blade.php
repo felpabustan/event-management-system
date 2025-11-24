@@ -45,6 +45,7 @@
                                 <option value="image" {{ old('type', $contentBlock->type) == 'image' ? 'selected' : '' }}>Image</option>
                                 <option value="events" {{ old('type', $contentBlock->type) == 'events' ? 'selected' : '' }}>Events List</option>
                                 <option value="html" {{ old('type', $contentBlock->type) == 'html' ? 'selected' : '' }}>Custom HTML</option>
+                                <option value="form" {{ old('type', $contentBlock->type) == 'form' ? 'selected' : '' }}>Form Block</option>
                             </select>
                         </div>
 
@@ -275,6 +276,68 @@
                             </div>
                         </div>
 
+                        <!-- Form Block Fields -->
+                        <div id="form-fields" style="display: none;">
+                            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                                <p class="text-sm text-blue-800">Edit your form configuration. Submissions are saved to a CSV file that you can download from the submissions page.</p>
+                                @if($contentBlock->type === 'form' && $contentBlock->formSubmission)
+                                    <a href="{{ route('form-submissions.index', $contentBlock) }}" class="mt-2 inline-flex items-center text-sm text-blue-600 hover:text-blue-800">
+                                        View {{ $contentBlock->formSubmission->submission_count }} submission(s) →
+                                    </a>
+                                @endif
+                            </div>
+                            
+                            <div class="space-y-4">
+                                <div>
+                                    <label for="form_title_edit" class="block text-sm font-medium text-gray-700">Form Title</label>
+                                    <input type="text" name="content[form_title]" id="form_title_edit" 
+                                           value="{{ old('content.form_title', $contentBlock->content['form_title'] ?? '') }}"
+                                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" 
+                                           placeholder="Join Our Mailing List">
+                                </div>
+                                
+                                <div>
+                                    <label for="form_description_edit" class="block text-sm font-medium text-gray-700">Description</label>
+                                    <textarea name="content[description]" id="form_description_edit" rows="3"
+                                              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                              placeholder="Sign up to receive updates about our upcoming events.">{{ old('content.description', $contentBlock->content['description'] ?? '') }}</textarea>
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Form Fields</label>
+                                    <div id="form-fields-container-edit" class="space-y-4">
+                                        <!-- Existing fields will be loaded here -->
+                                    </div>
+                                    <button type="button" onclick="addFormFieldEdit()" class="mt-3 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded text-xs">
+                                        + Add Field
+                                    </button>
+                                </div>
+
+                                <div>
+                                    <label for="submit_button_text_edit" class="block text-sm font-medium text-gray-700">Submit Button Text</label>
+                                    <input type="text" name="content[submit_button_text]" id="submit_button_text_edit" 
+                                           value="{{ old('content.submit_button_text', $contentBlock->content['submit_button_text'] ?? 'Submit') }}"
+                                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                </div>
+
+                                <div>
+                                    <label for="success_message_edit" class="block text-sm font-medium text-gray-700">Success Message</label>
+                                    <input type="text" name="content[success_message]" id="success_message_edit" 
+                                           value="{{ old('content.success_message', $contentBlock->content['success_message'] ?? 'Thank you for your submission!') }}"
+                                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                </div>
+
+                                <div>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" name="content[collect_ip]" value="1" 
+                                               {{ old('content.collect_ip', $contentBlock->content['collect_ip'] ?? false) ? 'checked' : '' }}
+                                               class="rounded border-gray-300 text-indigo-600 shadow-sm">
+                                        <span class="ml-2 text-sm text-gray-600">Collect IP addresses with submissions</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
                         <!-- Location Fields -->
                         </div>
 
@@ -304,6 +367,130 @@
     </div>
 
     <script>
+        let fieldCounterEdit = 0;
+
+        function addFormFieldEdit() {
+            fieldCounterEdit++;
+            const container = document.getElementById('form-fields-container-edit');
+            const fieldHtml = `
+                <div class="border border-gray-300 rounded-lg p-4 bg-gray-50" id="field-edit-${fieldCounterEdit}">
+                    <div class="flex justify-between items-start mb-3">
+                        <h4 class="text-sm font-semibold text-gray-700">Field #${fieldCounterEdit}</h4>
+                        <button type="button" onclick="removeFormFieldEdit(${fieldCounterEdit})" class="text-red-600 hover:text-red-800 text-sm">Remove</button>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-medium text-gray-600 mb-1">Field Type</label>
+                            <select name="content[fields][${fieldCounterEdit}][type]" class="block w-full border-gray-300 rounded-md shadow-sm text-sm" required>
+                                <option value="text">Text</option>
+                                <option value="email">Email</option>
+                                <option value="tel">Phone</option>
+                                <option value="number">Number</option>
+                                <option value="textarea">Text Area</option>
+                                <option value="select">Dropdown</option>
+                                <option value="checkbox">Checkbox</option>
+                                <option value="radio">Radio Buttons</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-600 mb-1">Field Label</label>
+                            <input type="text" name="content[fields][${fieldCounterEdit}][label]" class="block w-full border-gray-300 rounded-md shadow-sm text-sm" placeholder="e.g., Email Address" required>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-600 mb-1">Placeholder</label>
+                            <input type="text" name="content[fields][${fieldCounterEdit}][placeholder]" class="block w-full border-gray-300 rounded-md shadow-sm text-sm" placeholder="e.g., your@email.com">
+                        </div>
+                        <div class="flex items-center">
+                            <label class="flex items-center">
+                                <input type="checkbox" name="content[fields][${fieldCounterEdit}][required]" value="1" class="rounded border-gray-300 text-indigo-600 shadow-sm">
+                                <span class="ml-2 text-xs text-gray-600">Required field</span>
+                            </label>
+                        </div>
+                    </div>
+                    <input type="hidden" name="content[fields][${fieldCounterEdit}][id]" value="${fieldCounterEdit}">
+                </div>
+            `;
+            container.insertAdjacentHTML('beforeend', fieldHtml);
+        }
+
+        function removeFormFieldEdit(id) {
+            const field = document.getElementById('field-edit-' + id);
+            if (field) {
+                field.remove();
+            }
+        }
+
+        function loadExistingFields() {
+            const contentBlock = @json($contentBlock->content ?? []);
+            if (contentBlock.fields) {
+                const container = document.getElementById('form-fields-container-edit');
+                container.innerHTML = '';
+                
+                // Convert fields object/array to array
+                const fieldsArray = Array.isArray(contentBlock.fields) 
+                    ? contentBlock.fields 
+                    : Object.values(contentBlock.fields);
+                
+                fieldsArray.forEach((field) => {
+                    if (!field || typeof field !== 'object') return;
+                    
+                    fieldCounterEdit++;
+                    const fieldId = field.id || fieldCounterEdit;
+                    const fieldHtml = `
+                        <div class="border border-gray-300 rounded-lg p-4 bg-gray-50" id="field-edit-${fieldCounterEdit}">
+                            <div class="flex justify-between items-start mb-3">
+                                <h4 class="text-sm font-semibold text-gray-700">Field #${fieldCounterEdit}</h4>
+                                <button type="button" onclick="removeFormFieldEdit(${fieldCounterEdit})" class="text-red-600 hover:text-red-800 text-sm">Remove</button>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-600 mb-1">Field Type</label>
+                                    <select name="content[fields][${fieldCounterEdit}][type]" class="block w-full border-gray-300 rounded-md shadow-sm text-sm" required>
+                                        <option value="text" ${field.type === 'text' ? 'selected' : ''}>Text</option>
+                                        <option value="email" ${field.type === 'email' ? 'selected' : ''}>Email</option>
+                                        <option value="tel" ${field.type === 'tel' ? 'selected' : ''}>Phone</option>
+                                        <option value="number" ${field.type === 'number' ? 'selected' : ''}>Number</option>
+                                        <option value="textarea" ${field.type === 'textarea' ? 'selected' : ''}>Text Area</option>
+                                        <option value="select" ${field.type === 'select' ? 'selected' : ''}>Dropdown</option>
+                                        <option value="checkbox" ${field.type === 'checkbox' ? 'selected' : ''}>Checkbox</option>
+                                        <option value="radio" ${field.type === 'radio' ? 'selected' : ''}>Radio Buttons</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-600 mb-1">Field Label</label>
+                                    <input type="text" name="content[fields][${fieldCounterEdit}][label]" value="${escapeHtml(field.label || '')}" class="block w-full border-gray-300 rounded-md shadow-sm text-sm" placeholder="e.g., Email Address" required>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-600 mb-1">Placeholder</label>
+                                    <input type="text" name="content[fields][${fieldCounterEdit}][placeholder]" value="${escapeHtml(field.placeholder || '')}" class="block w-full border-gray-300 rounded-md shadow-sm text-sm" placeholder="e.g., your@email.com">
+                                </div>
+                                <div class="flex items-center">
+                                    <label class="flex items-center">
+                                        <input type="checkbox" name="content[fields][${fieldCounterEdit}][required]" value="1" ${field.required ? 'checked' : ''} class="rounded border-gray-300 text-indigo-600 shadow-sm">
+                                        <span class="ml-2 text-xs text-gray-600">Required field</span>
+                                    </label>
+                                </div>
+                            </div>
+                            <input type="hidden" name="content[fields][${fieldCounterEdit}][id]" value="${fieldId}">
+                        </div>
+                    `;
+                    container.insertAdjacentHTML('beforeend', fieldHtml);
+                });
+            }
+        }
+        
+        // Helper function to escape HTML
+        function escapeHtml(text) {
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return text.replace(/[&<>"']/g, m => map[m]);
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
             const typeSelect = document.getElementById('type');
             const heroFields = document.getElementById('hero-fields');
@@ -312,6 +499,7 @@
             const imageFields = document.getElementById('image-fields');
             const eventsFields = document.getElementById('events-fields');
             const htmlFields = document.getElementById('html-fields');
+            const formFields = document.getElementById('form-fields');
             
             // Hero section toggles
             const heroShowContent = document.getElementById('hero_show_content');
@@ -327,6 +515,7 @@
                 imageFields.style.display = 'none';
                 eventsFields.style.display = 'none';
                 htmlFields.style.display = 'none';
+                formFields.style.display = 'none';
 
                 // Show relevant fields based on selection
                 const selectedType = typeSelect.value;
@@ -352,6 +541,10 @@
                         break;
                     case 'html':
                         htmlFields.style.display = 'block';
+                        break;
+                    case 'form':
+                        formFields.style.display = 'block';
+                        loadExistingFields();
                         break;
                 }
             }

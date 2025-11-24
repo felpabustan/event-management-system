@@ -37,7 +37,7 @@ class HomepageContentController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $validated = $request->validate([
-            'type' => 'required|in:hero,text,video,image,events,html',
+            'type' => 'required|in:hero,text,video,image,events,html,form',
             'title' => 'nullable|string|max:255',
             'content' => 'required|array',
             'is_active' => 'boolean',
@@ -82,7 +82,7 @@ class HomepageContentController extends Controller
     {
         $validated = $request->validate([
             'title' => 'nullable|string|max:255',
-            'type' => 'required|in:hero,text,video,image,events,html',
+            'type' => 'required|in:hero,text,video,image,events,html,form',
             'content' => 'nullable|array',
             'is_active' => 'boolean',
         ]);
@@ -131,6 +131,16 @@ class HomepageContentController extends Controller
                     'html' => $validated['content']['html'] ?? '',
                     'css' => $validated['content']['css'] ?? '',
                     'description' => $validated['content']['description'] ?? '',
+                ]);
+                break;
+            case 'form':
+                $content = array_merge($content, [
+                    'form_title' => $validated['content']['form_title'] ?? '',
+                    'description' => $validated['content']['description'] ?? '',
+                    'fields' => $validated['content']['fields'] ?? [],
+                    'submit_button_text' => $validated['content']['submit_button_text'] ?? 'Submit',
+                    'success_message' => $validated['content']['success_message'] ?? 'Thank you for your submission!',
+                    'collect_ip' => isset($validated['content']['collect_ip']),
                 ]);
                 break;
         }

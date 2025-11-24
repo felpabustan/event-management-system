@@ -6,6 +6,7 @@ use App\Http\Controllers\RegistrationController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\HomepageSettingsController;
 use App\Http\Controllers\HomepageContentController;
+use App\Http\Controllers\FormSubmissionController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\CheckInController;
 use App\Http\Controllers\Admin\UserController;
@@ -19,6 +20,10 @@ Route::get('/events', [RegistrationController::class, 'index'])->name('events.pu
 Route::get('/events/{event}', [RegistrationController::class, 'show'])->name('events.public.show');
 Route::post('/events/{event}/register', [RegistrationController::class, 'store'])->name('events.register');
 Route::post('/events/{event}/check-category-status', [RegistrationController::class, 'checkCategoryStatus'])->name('events.check.category');
+
+// Form submissions (public)
+Route::post('/form/{contentBlock}/submit', [FormSubmissionController::class, 'submit'])
+    ->name('form-submissions.submit');
 
 // Payment routes
 Route::post('/events/{event}/payment/checkout', [PaymentController::class, 'createCheckoutSession'])
@@ -99,6 +104,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
     ]);
     Route::post('/admin/homepage-content/update-order', [HomepageContentController::class, 'updateOrder'])
         ->name('homepage-content.update-order');
+    
+    // Form Submissions Management
+    Route::get('/admin/form-submissions/{contentBlock}', [FormSubmissionController::class, 'index'])
+        ->name('form-submissions.index');
+    Route::get('/admin/form-submissions/{contentBlock}/download', [FormSubmissionController::class, 'downloadCsv'])
+        ->name('form-submissions.download');
+    Route::delete('/admin/form-submissions/{contentBlock}/clear', [FormSubmissionController::class, 'clear'])
+        ->name('form-submissions.clear');
     
     // Admin User Management (Super Admin only)
     Route::resource('/admin/users', UserController::class, [

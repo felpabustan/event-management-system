@@ -112,8 +112,28 @@ class HomepageContentBlock extends Model
             'image' => 'Image Block',
             'events' => 'Events Listing',
             'html' => 'Custom HTML',
+            'form' => 'Form Block',
             default => ucfirst($this->type),
         };
+    }
+
+    /**
+     * Get form submission record for this block
+     */
+    public function formSubmission()
+    {
+        return $this->hasOne(FormSubmission::class, 'content_block_id');
+    }
+
+    /**
+     * Get form configuration
+     */
+    public function getFormConfig(): ?array
+    {
+        if ($this->type === 'form' && isset($this->content['fields'])) {
+            return $this->content;
+        }
+        return null;
     }
 
     /**
